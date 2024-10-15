@@ -18,7 +18,7 @@ main() {
 	mkdir -p "$bin_dir"
 	mkdir -p "$tmp_dir"
   
-  download_url="https://github.com/valyentdev/cli/releases/download/$version/cli_${os}_$arch.tar.gz"
+  download_url="https://github.com/valyentdev/cli/releases/download/$version/valyent_${os}_$arch.tar.gz"
 	echo "Downloading $download_url..."
   curl -q --fail --location --progress-bar --output "$tmp_dir/valyent.tar.gz" "$download_url"
 	tar -C "$tmp_dir" -xzf "$tmp_dir/valyent.tar.gz"
