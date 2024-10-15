@@ -5,7 +5,8 @@ set -e
 main() {
   response=$(curl -s "https://api.github.com/repos/valyentdev/cli/releases/latest")
   latest_version=$(echo "$response" | grep -m 1 '"name":' | awk -F'"' '{print $4}')
-  os=$(uname -s)
+  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+
   arch=$(uname -m)
   version=${1:-$latest_version}
 
