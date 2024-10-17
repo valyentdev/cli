@@ -8,6 +8,7 @@ func NewCmd() *cobra.Command {
 	}
 
 	authCmd.AddCommand(newLoginCmd())
+	authCmd.AddCommand(newLogoutCmd())
 
 	return authCmd
 }

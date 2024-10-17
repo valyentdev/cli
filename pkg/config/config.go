@@ -55,3 +55,12 @@ func directoryExists(dir string) bool {
 	}
 	return info.IsDir()
 }
+
+func RemoveConfigFile() error {
+	configDir, err := initConfigDir()
+	if err != nil {
+		return err
+	}
+
+	return os.Remove(filepath.Join(configDir, "config.yaml"))
+}
