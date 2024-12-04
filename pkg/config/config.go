@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-func StoreAPIKey(key string) error {
-	_, err := initConfigDir()
+func StoreAPIKey(key string) (err error) {
+	_, err = initConfigDir()
 	if err != nil {
 		return err
 	}
@@ -19,7 +19,7 @@ func StoreAPIKey(key string) error {
 		return err
 	}
 
-	return nil
+	return
 }
 
 func initConfigDir() (string, error) {
@@ -63,4 +63,75 @@ func RemoveConfigFile() error {
 	}
 
 	return os.Remove(filepath.Join(configDir, "config.yaml"))
+}
+
+func RetrieveAPIKey() (string, error) {
+	configDir, err := initConfigDir()
+	if err != nil {
+		return "", err
+	}
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(configDir)
+
+	if err := viper.ReadInConfig(); err != nil {
+		return "", err
+	}
+
+	key := viper.GetString("key")
+
+	return key, nil
+}
+
+func IsAlreadyInitialized() bool {
+	vi := viper.New()
+	vi.SetConfigName("valyent")
+	vi.AddConfigPath(".")
+	vi.SetConfigType("toml")
+
+	err := vi.ReadInConfig()
+
+	return err == nil
+}
+
+func InitializeConfigFile(
+	fleetID string,
+) error {
+	vi := viper.New()
+	vi.SetConfigName("valyent")
+	vi.AddConfigPath(".")
+	vi.SetConfigType("toml")
+
+	vi.Set("fleet_id", fleetID)
+
+	var fileExists bool
+
+	_, err := os.Stat("valyent.toml")
+	if err == nil {
+		fileExists = true
+	} else if os.IsNotExist(err) {
+		fileExists = false
+	} else {
+		return err
+	}
+
+	if fileExists {
+		err = vi.MergeInConfig()
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err = os.Create("valyent.toml")
+		if err != nil {
+			return err
+		}
+	}
+
+	err = vi.WriteConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

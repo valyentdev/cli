@@ -8,7 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	stdhttp "net/http"
+	stdHTTP "net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -90,13 +90,13 @@ func retrieveAPIKeyFromTheBrowser() (err error, apiKey string) {
 			}
 			res := &response{}
 
-			err := http.PerformRequest(stdhttp.MethodGet, "/auth/cli/session", res)
+			err := http.PerformRequest(stdHTTP.MethodGet, "/auth/cli/session", nil, res)
 			if err != nil {
 				return
 			}
 
 			// Open the authentication page in the browser.
-			baseURL := env.GetVar("VALYENT_API_URL", "https://console.valyent.dev")
+			baseURL := env.GetVar("VALYENT_API_URL", "https://console.valyent.cloud")
 			url := baseURL + "/auth/cli/" + res.SessionID
 			err = openInBrowser(url)
 			if err != nil {
@@ -133,7 +133,7 @@ func waitForLogin(sessionId string) (apiKey string, err error) {
 			res := &waitForLoginResponse{}
 
 			path := "/auth/cli/" + sessionId + "/wait"
-			err := http.PerformRequest(stdhttp.MethodGet, path, res)
+			err := http.PerformRequest(stdHTTP.MethodGet, path, nil, res)
 			if err != nil {
 				return "", fmt.Errorf("authentication check failed: %w", err)
 			}
@@ -170,7 +170,7 @@ func authenticateDockerRegistry(apiKey string) (err error) {
 	}
 
 	// Compute Valyent's registry host.
-	registryHost := env.GetVar("VALYENT_REGISTRY_HOST", "registry.valyent.dev")
+	registryHost := env.GetVar("VALYENT_REGISTRY_HOST", "registry.valyent.cloud")
 
 	// Prepare `docker login` command.
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -204,8 +204,6 @@ func authenticateDockerRegistry(apiKey string) (err error) {
 	if err != nil {
 		return err
 	}
-
-	fmt.Println("rggrggthere")
 
 	// Wait for the `docker login` command to be completed
 	if err = cmd.Wait(); err != nil {
@@ -270,14 +268,14 @@ func ensureDockerConfigDir(home string) error {
 //
 //	{
 //	  "auths": {
-//	    "registry.valyent.dev": {
+//	    "registry.valyent.cloud": {
 //	      "auth": "x:..."
 //	    }
 //	  }
 //	}
 func addValyentAuthToDockerConfig(apiKey string, configJSON []byte) ([]byte, error) {
 	// Compute Valyent's registry host.
-	registryHost := env.GetVar("VALYENT_REGISTRY_HOST", "registry.valyent.dev")
+	registryHost := env.GetVar("VALYENT_REGISTRY_HOST", "registry.valyent.cloud")
 
 	var dockerConfig map[string]json.RawMessage
 	if len(configJSON) == 0 {

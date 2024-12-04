@@ -23,7 +23,7 @@
 ## Installation
 
 ```bash
-curl -L https://cli.valyent.dev/install.sh | sh
+curl -L https://cli.valyent.cloud/install.sh | sh
 ```
 
 ## License

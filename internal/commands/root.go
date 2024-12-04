@@ -11,6 +11,7 @@ func NewRootCmd() *cobra.Command {
 		Short: "A CLI tool to interact with Valyent's API.",
 	}
 	rootCmd.AddCommand(auth.NewCmd())
+	rootCmd.AddCommand(newInitCmd())
 
 	return rootCmd
 }
