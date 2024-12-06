@@ -2,10 +2,7 @@ package machines
 
 import (
 	"fmt"
-	"os"
-	"time"
 
-	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/internal/tui"
 	"github.com/valyentdev/cli/pkg/http"
@@ -47,14 +44,7 @@ func runLogsCmd() error {
 	}
 
 	for _, logEntry := range logEntries {
-		if logEntry.Level == "info" {
-			logger := log.New(os.Stdout)
-			logger.SetReportTimestamp(true)
-			logger.SetTimeFunction(func(t time.Time) time.Time {
-				return time.Unix(logEntry.Timestamp, 0)
-			})
-			logger.Info(logEntry.Message)
-		}
+		fmt.Println(logEntry.Message)
 	}
 
 	return nil
