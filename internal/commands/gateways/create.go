@@ -63,7 +63,6 @@ func runCreateGatewayCmd() (err error) {
 		TargetPort int    `json:"target_port"`
 	}
 
-	var respTarget any
 	err = http.PerformRequest(
 		"POST",
 		"/v1/gateways",
@@ -72,7 +71,7 @@ func runCreateGatewayCmd() (err error) {
 			Name:       gatewayName,
 			TargetPort: gatewayTargetPort,
 		},
-		&respTarget,
+		nil,
 	)
 	if err != nil {
 		return fmt.Errorf("failed to create gateway: %v", err)
