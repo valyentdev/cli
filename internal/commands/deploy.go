@@ -1,6 +1,12 @@
 package commands
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+	"github.com/valyentdev/cli/pkg/config"
+	"github.com/valyentdev/cli/pkg/http"
+)
 
 func newDeployCmd() *cobra.Command {
 	deployCmd := &cobra.Command{
@@ -14,6 +20,23 @@ func newDeployCmd() *cobra.Command {
 	return deployCmd
 }
 
-func runDeployCmd() (err error) {
-	return
+func runDeployCmd() error {
+	cfg, err := config.RetrieveProjectConfiguration()
+	if err != nil {
+		return err
+	}
+
+	err = http.PerformRequest(
+		"POST",
+		"/v1/fleets/"+cfg.FleetID+"/machines",
+		cfg,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("🎉 Machine successfully created!")
+
+	return nil
 }
