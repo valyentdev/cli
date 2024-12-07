@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/valyentdev/cli/internal/commands"
+	commands "github.com/valyentdev/cli/commands"
 	"github.com/valyentdev/cli/pkg/exit"
 )
 
