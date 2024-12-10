@@ -79,6 +79,7 @@ func SelectMachine(fleetID string) (string, error) {
 		items = append(items, FancySelectItem{
 			title:       machine.Id,
 			description: getDescriptionForMachine(machine),
+			value:       machine.Id,
 		})
 	}
 

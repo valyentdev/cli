@@ -1,8 +1,6 @@
 package tui
 
 import (
-	"fmt"
-
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -11,11 +9,13 @@ import (
 type FancySelectItem struct {
 	title       string
 	description string
+	value       string
 }
 
 func (i FancySelectItem) Title() string       { return i.title }
 func (i FancySelectItem) Description() string { return i.description }
 func (i FancySelectItem) FilterValue() string { return i.title }
+func (i FancySelectItem) Value() string       { return i.value }
 
 type fancySelectModel struct {
 	list     list.Model
@@ -39,7 +39,7 @@ func (m *fancySelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "enter": // Select the current item
 			if selectedItem, ok := m.list.SelectedItem().(FancySelectItem); ok {
-				m.selected = selectedItem.title
+				m.selected = selectedItem.Value()
 			}
 			return m, tea.Quit
 		}
@@ -59,9 +59,6 @@ func (m *fancySelectModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m *fancySelectModel) View() string {
 	if m.quitting {
 		return "Goodbye!"
-	}
-	if m.selected != "" {
-		return fmt.Sprintf("You selected: %s", m.selected)
 	}
 	return m.style.Render(m.list.View())
 }

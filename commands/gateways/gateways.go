@@ -8,6 +8,7 @@ func NewCmd() *cobra.Command {
 	}
 	gatewaysCmd.AddCommand(newCreateGatewayCmd())
 	gatewaysCmd.AddCommand(newListGatewaysCmd())
+	gatewaysCmd.AddCommand(newDeleteGatewayCmd())
 
 	return gatewaysCmd
 }
