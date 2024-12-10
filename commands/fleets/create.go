@@ -5,46 +5,42 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
-	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/api"
 )
 
 func newCreateFleetCmd() *cobra.Command {
 	createFleetCmd := &cobra.Command{
 		Use: "create",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreateFleetCmd()
+			name, err := cmd.Flags().GetString("name")
+			if err != nil {
+				return err
+			}
+
+			return runCreateFleetCmd(name)
 		},
 	}
+
+	createFleetCmd.Flags().StringP("name", "f", "", "The name of your fleet (optional)")
 
 	return createFleetCmd
 }
 
-func runCreateFleetCmd() error {
-	// We ask for the name of the fleet.
-	fleetName := ""
-	err := huh.
-		NewInput().
-		Title("Type the name of your fleet:").
-		Placeholder("bolero").
-		Value(&fleetName).
-		Run()
-	if err != nil {
-		return fmt.Errorf("failed to retrive name for fleet: %v", err)
+func runCreateFleetCmd(name string) error {
+	// We ask for the name of the fleet, if not already specified through a flag.
+	if name == "" {
+		err := huh.
+			NewInput().
+			Title("Type the name of your fleet:").
+			Placeholder("bolero").
+			Value(&name).
+			Run()
+		if err != nil {
+			return fmt.Errorf("failed to retrive name for fleet: %v", err)
+		}
 	}
 
-	type createFleetOptions struct {
-		Name string `json:"name"`
-	}
-
-	err = http.PerformRequest(
-		"POST",
-		"/v1/fleets",
-		createFleetOptions{
-			Name: fleetName,
-		},
-		nil,
-	)
-	if err != nil {
+	if err := api.CreateFleet(name); err != nil {
 		return fmt.Errorf("failed to create fleet: %v", err)
 	}
 

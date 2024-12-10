@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	stdHTTP "net/http"
 
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/ravel/api"
@@ -28,7 +29,7 @@ func GetMachineEvents(fleetID, machineID string) ([]api.MachineEvent, error) {
 func DeleteMachine(fleetID, machineID string, force bool) error {
 	resp := map[string]any{}
 	err := http.PerformRequest(
-		"DELETE",
+		stdHTTP.MethodDelete,
 		fmt.Sprintf("/v1/fleets/%s/machines/%s?force=%t", fleetID, machineID, force),
 		nil, &resp,
 	)

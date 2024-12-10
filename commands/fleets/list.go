@@ -6,14 +6,14 @@ import (
 )
 
 func newListFleetsCmd() *cobra.Command {
-	listGatewaysCmd := &cobra.Command{
+	listFleetsCmd := &cobra.Command{
 		Use: "list",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runListFleetsCmd()
 		},
 	}
 
-	return listGatewaysCmd
+	return listFleetsCmd
 }
 
 func runListFleetsCmd() error {

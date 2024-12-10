@@ -8,6 +8,7 @@ func NewCmd() *cobra.Command {
 	}
 	fleetsCmd.AddCommand(newCreateFleetCmd())
 	fleetsCmd.AddCommand(newListFleetsCmd())
+	fleetsCmd.AddCommand(newDeleteFleetCmd())
 
 	return fleetsCmd
 }
