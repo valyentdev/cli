@@ -24,3 +24,16 @@ func GetMachineEvents(fleetID, machineID string) ([]api.MachineEvent, error) {
 	}
 	return events, nil
 }
+
+func DeleteMachine(fleetID, machineID string, force bool) error {
+	resp := map[string]any{}
+	err := http.PerformRequest(
+		"DELETE",
+		fmt.Sprintf("/v1/fleets/%s/machines/%s?force=%t", fleetID, machineID, force),
+		nil, &resp,
+	)
+	if err != nil {
+		return fmt.Errorf("failed to delete machine: %v", resp["detail"])
+	}
+	return nil
+}

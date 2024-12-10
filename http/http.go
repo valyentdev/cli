@@ -53,11 +53,6 @@ func PerformRequest(method, path string, payload any, responseTarget any) error 
 	}
 	defer resp.Body.Close()
 
-	// Check for non-2xx HTTP response
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("HTTP request failed with status %s", resp.Status)
-	}
-
 	// Read and process the response body
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -69,6 +64,11 @@ func PerformRequest(method, path string, payload any, responseTarget any) error 
 		if err := json.Unmarshal(respBody, responseTarget); err != nil {
 			return fmt.Errorf("failed to unmarshal JSON response: %w", err)
 		}
+	}
+
+	// Check for non-2xx HTTP response
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return fmt.Errorf("HTTP request failed with status %s", resp.Status)
 	}
 
 	return nil
