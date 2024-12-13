@@ -2,22 +2,26 @@ package tui
 
 import (
 	"fmt"
-	stdHTTP "net/http"
 
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/huh/spinner"
-	api "github.com/valyentdev/cli/api"
 	"github.com/valyentdev/cli/http"
 	ravelAPI "github.com/valyentdev/ravel/api"
 )
 
 // SelectFleet prompts the user to select an existing fleet from the list.
 func SelectFleet() (fleetID string, err error) {
-	// Retrieve fleets from the API.
-	fleets, err := api.GetFleets()
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
 	if err != nil {
-		return
+		return fleetID, fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
+	// Retrieve fleets from the API.
+	fleets, err := client.GetFleets()
+	if err != nil {
+		return "", err
 	}
 
 	return SelectFleetWithFleets(fleets)
@@ -49,8 +53,14 @@ func SelectFleetWithFleets(fleets []ravelAPI.Fleet) (fleetID string, err error) 
 
 // SelectOrCreateFleet lets the user select or create a fleet.
 func SelectOrCreateFleet() (fleetID string, err error) {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return "", fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve fleets from the API.
-	fleets, err := api.GetFleets()
+	fleets, err := client.GetFleets()
 	if err != nil {
 		return
 	}
@@ -85,17 +95,16 @@ func SelectOrCreateFleet() (fleetID string, err error) {
 			New().
 			Title("Creating fleet...").
 			Action(func() {
-				payload := struct {
-					Name string `json:"name"`
-				}{
+				// Call the API asking for fleet creation.
+				var fleet *ravelAPI.Fleet
+				fleet, err = client.CreateFleet(ravelAPI.CreateFleetPayload{
 					Name: fleetName,
-				}
-				createFleetResponse := &ravelAPI.Fleet{}
-				err = http.PerformRequest(stdHTTP.MethodPost, "/v1/fleets", payload, createFleetResponse)
+				})
 				if err != nil {
 					return
 				}
-				fleetID = createFleetResponse.Id
+
+				fleetID = fleet.Id
 			}).
 			Run()
 		if err != nil {
@@ -109,8 +118,14 @@ func SelectOrCreateFleet() (fleetID string, err error) {
 // ListFleets lists the fleets related to the currently authenticated's namespace
 // without prompting the user to choose one for further actions.
 func ListFleets() error {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve fleets from the API.
-	fleets, err := api.GetFleets()
+	fleets, err := client.GetFleets()
 	if err != nil {
 		return err
 	}

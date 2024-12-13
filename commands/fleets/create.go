@@ -5,7 +5,8 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
-	"github.com/valyentdev/cli/api"
+	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/ravel/api"
 )
 
 func newCreateFleetCmd() *cobra.Command {
@@ -40,11 +41,21 @@ func runCreateFleetCmd(name string) error {
 		}
 	}
 
-	if err := api.CreateFleet(name); err != nil {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
+	// Call the API asking for the creation of a fleet.
+	fleet, err := client.CreateFleet(api.CreateFleetPayload{
+		Name: name,
+	})
+	if err != nil {
 		return fmt.Errorf("failed to create fleet: %v", err)
 	}
 
-	fmt.Println("🎉 Fleet successfully created!")
+	fmt.Printf("Fleet successfully created with id \"%s\"!", fleet.Id)
 
 	return nil
 }

@@ -4,13 +4,19 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/list"
-	api "github.com/valyentdev/cli/api"
-	ravelAPI "github.com/valyentdev/ravel/api"
+	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/ravel/api"
 )
 
-func ListGateways(fleets []ravelAPI.Fleet) error {
+func ListGateways(fleets []api.Fleet) error {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve gateways from the API.
-	gateways, err := api.GetGateways()
+	gateways, err := client.GetGateways()
 	if err != nil {
 		return err
 	}
@@ -35,9 +41,15 @@ func ListGateways(fleets []ravelAPI.Fleet) error {
 	return List("List of Gateways", items)
 }
 
-func SelectGateway(fleets []ravelAPI.Fleet) (gatewayID string, err error) {
+func SelectGateway(fleets []api.Fleet) (gatewayID string, err error) {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return "", fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve gateways from the API.
-	gateways, err := api.GetGateways()
+	gateways, err := client.GetGateways()
 	if err != nil {
 		return "", err
 	}

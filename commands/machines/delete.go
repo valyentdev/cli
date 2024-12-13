@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
-	"github.com/valyentdev/cli/api"
+	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -40,7 +40,13 @@ func runDeleteMachineCmd() error {
 		return err
 	}
 
-	if err := api.DeleteMachine(fleetID, machineID, force); err != nil {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
+	if err := client.DeleteMachine(fleetID, machineID, force); err != nil {
 		return err
 	}
 

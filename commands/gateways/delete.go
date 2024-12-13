@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
-	"github.com/valyentdev/cli/api"
+	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -32,9 +32,15 @@ func newDeleteGatewayCmd() *cobra.Command {
 }
 
 func runDeleteGatewayCmd(gatewayID string, confirmed bool) (err error) {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// We retrieve fleets from the API,
 	// from the currently authenticated namespace.
-	fleets, err := api.GetFleets()
+	fleets, err := client.GetFleets()
 	if err != nil {
 		return err
 	}
@@ -69,7 +75,7 @@ func runDeleteGatewayCmd(gatewayID string, confirmed bool) (err error) {
 	}
 
 	// Now, we can safely try to delete the gateway.
-	if err := api.DeleteGateway(gatewayID); err != nil {
+	if err := client.DeleteGateway(gatewayID); err != nil {
 		return err
 	}
 

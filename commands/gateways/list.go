@@ -1,8 +1,11 @@
 package gateways
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
-	api "github.com/valyentdev/cli/api"
+
+	"github.com/valyentdev/cli/http"
 	tui "github.com/valyentdev/cli/tui"
 )
 
@@ -18,8 +21,14 @@ func newListGatewaysCmd() *cobra.Command {
 }
 
 func runListGatewaysCmd() error {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve fleets from the API.
-	fleets, err := api.GetFleets()
+	fleets, err := client.GetFleets()
 	if err != nil {
 		return err
 	}

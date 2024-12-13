@@ -43,9 +43,15 @@ func runStartMachineCmd() error {
 		return nil
 	}
 
-	err = http.PerformRequest("POST", fmt.Sprintf("/fleets/%s/machines/%s/start", fleetID, machineID), nil, nil)
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
+	// Call the API asking to start this machine.
+	if err := client.StartMachine(fleetID, machineID); err != nil {
+		return fmt.Errorf("the API call asking to start machine failed: %v", err)
 	}
 
 	fmt.Println("Machine started!")

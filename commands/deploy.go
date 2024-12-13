@@ -21,19 +21,21 @@ func newDeployCmd() *cobra.Command {
 }
 
 func runDeployCmd() error {
+	// Retrieve the project configuration from the `valyent.json`.
 	cfg, err := config.RetrieveProjectConfiguration()
 	if err != nil {
 		return err
 	}
 
-	err = http.PerformRequest(
-		"POST",
-		"/v1/fleets/"+cfg.FleetID+"/machines",
-		cfg,
-		nil,
-	)
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
+	// Call the API asking for machine creation.
+	if _, err := client.CreateMachine(cfg.FleetID, cfg.CreateMachinePayload); err != nil {
+		return fmt.Errorf("failed to create machine: %v", err)
 	}
 
 	fmt.Println("🎉 Machine successfully created!")

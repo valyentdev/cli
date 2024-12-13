@@ -12,6 +12,7 @@ func NewCmd() *cobra.Command {
 	machinesCmd.AddCommand(newStartMachineCmd())
 	machinesCmd.AddCommand(newStopMachineCmd())
 	machinesCmd.AddCommand(newDeleteMachineCmd())
+	machinesCmd.AddCommand(newCreateMachineCmd())
 
 	return machinesCmd
 }

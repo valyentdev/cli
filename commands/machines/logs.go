@@ -6,7 +6,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/tui"
-	"github.com/valyentdev/ravel/api"
 )
 
 func newLogsCmd() *cobra.Command {
@@ -33,16 +32,19 @@ func runLogsCmd() error {
 		return err
 	}
 
-	logEntries := []api.LogEntry{}
-	err = http.PerformRequest(
-		"GET",
-		fmt.Sprintf("/v1/fleets/%s/machines/%s/logs", fleetID, machineID),
-		nil, &logEntries,
-	)
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 	}
 
+	// Let's fetch logs from the API.
+	logEntries, err := client.GetLogs(fleetID, machineID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch logs from the API: %v", err)
+	}
+
+	// For now, we just print each message from log entries.
 	for _, logEntry := range logEntries {
 		fmt.Println(logEntry.Message)
 	}

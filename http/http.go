@@ -1,75 +1,32 @@
 package http
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
+	"os"
 
 	"github.com/valyentdev/cli/config"
-	"github.com/valyentdev/cli/pkg/env"
+	api "github.com/valyentdev/valyent.go"
 )
 
-// PerformRequest sends an HTTP request with an optional JSON payload and unmarshals the JSON response if responseTarget is non-nil.
-func PerformRequest(method, path string, payload any, responseTarget any) error {
-	// Construct the URL
-	baseURL := env.GetVar("VALYENT_API_URL", "https://console.valyent.cloud")
-	url := baseURL + path
+// NewClient initializes a new Valyent HTTP API client instance,
+// providing the API key and allowing to specify the API base url from an environment variable.
+func NewClient() (*api.Client, error) {
+	// Initialize a new Valyent HTTP API client instance.
+	client := api.NewClient()
 
-	// Prepare request body if payload is provided
-	var body io.Reader
-	if payload != nil {
-		payloadBytes, err := json.Marshal(payload)
-		if err != nil {
-			return fmt.Errorf("failed to marshal payload to JSON: %w", err)
-		}
-		body = bytes.NewReader(payloadBytes)
+	// Customize the client's base URL field, if specified as an environment variable.
+	if baseURL := os.Getenv("VALYENT_API_URL"); baseURL != "" {
+		client.WithBaseURL(baseURL)
 	}
 
-	// Create the HTTP request
-	req, err := http.NewRequest(method, url, body)
+	// Retrieve the API key
+	apiKey, err := config.RetrieveAPIKey()
 	if err != nil {
-		return fmt.Errorf("failed to create HTTP request: %w", err)
+		return nil, fmt.Errorf("failed to retrieve API key: %v", err)
 	}
 
-	// Add authorization header if API key is available
-	apiKey, _ := config.RetrieveAPIKey()
-	if apiKey != "" {
-		req.Header.Add("Authorization", "Bearer "+apiKey)
-	}
+	// Set the retrieved API key as an authorization bearer token.
+	client.WithBearerToken(apiKey)
 
-	// Set appropriate headers
-	if payload != nil {
-		req.Header.Set("Accept", "application/json")
-		req.Header.Set("Content-Type", "application/json")
-	}
-
-	// Send the request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to execute HTTP request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Read and process the response body
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	// If responseTarget is non-nil, unmarshal the JSON response into it
-	if responseTarget != nil && len(respBody) > 0 {
-		if err := json.Unmarshal(respBody, responseTarget); err != nil {
-			return fmt.Errorf("failed to unmarshal JSON response: %w", err)
-		}
-	}
-
-	// Check for non-2xx HTTP response
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("HTTP request failed with status %s", resp.Status)
-	}
-
-	return nil
+	return client, nil
 }

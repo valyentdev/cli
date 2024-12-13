@@ -21,6 +21,7 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
+	"github.com/valyentdev/valyent.go"
 )
 
 func newLoginCmd() *cobra.Command {
@@ -57,7 +58,7 @@ func runLoginCmd() (err error) {
 			return
 		}
 	} else {
-		err, apiKey = retrieveAPIKeyFromTheBrowser()
+		apiKey, err = retrieveAPIKeyFromTheBrowser()
 		if err != nil {
 			return
 		}
@@ -80,17 +81,25 @@ func runLoginCmd() (err error) {
 	return
 }
 
-func retrieveAPIKeyFromTheBrowser() (err error, apiKey string) {
+func retrieveAPIKeyFromTheBrowser() (apiKey string, err error) {
 	err = spinner.New().
 		Title("Waiting for authentication...").
 		Action(func() {
+			// Initialize new Valyent API HTTP client.
+			var client *api.Client
+			client, err = http.NewClient()
+			if err != nil {
+				err = fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+				return
+			}
+
 			// Retrieve an authentication session.
 			type response struct {
 				SessionID string `json:"sessionID"`
 			}
 			res := &response{}
 
-			err := http.PerformRequest(stdHTTP.MethodGet, "/auth/cli/session", nil, res)
+			err = client.PerformRequest(stdHTTP.MethodGet, "/auth/cli/session", nil, res)
 			if err != nil {
 				return
 			}
@@ -126,6 +135,12 @@ func waitForLogin(sessionId string) (apiKey string, err error) {
 		case <-ctx.Done():
 			return "", fmt.Errorf("login timed out after 2 minutes")
 		case <-ticker.C:
+			// Initialize new Valyent API HTTP client.
+			client, err := http.NewClient()
+			if err != nil {
+				return "", fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+			}
+
 			type waitForLoginResponse struct {
 				Status string `json:"status"`
 				APIKey string `json:"apiKey"`
@@ -133,7 +148,7 @@ func waitForLogin(sessionId string) (apiKey string, err error) {
 			res := &waitForLoginResponse{}
 
 			path := "/auth/cli/" + sessionId + "/wait"
-			err := http.PerformRequest(stdHTTP.MethodGet, path, nil, res)
+			err = client.PerformRequest(stdHTTP.MethodGet, path, nil, res)
 			if err != nil {
 				return "", fmt.Errorf("authentication check failed: %w", err)
 			}

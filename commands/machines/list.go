@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/valyentdev/cli/api"
+	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -20,8 +20,14 @@ func newListMachinesCmd() *cobra.Command {
 }
 
 func runListMachinesCmd() error {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve fleets from the API.
-	fleets, err := api.GetFleets()
+	fleets, err := client.GetFleets()
 	if err != nil {
 		return fmt.Errorf("failed to retrieve fleets from the api: %v", err)
 	}
@@ -32,7 +38,7 @@ func runListMachinesCmd() error {
 		return fmt.Errorf("failed to select fleet: %v", err)
 	}
 
-	// List machines.
+	// Show a nice list of machines.
 	if err := tui.ListMachines(fleets, fleetID); err != nil {
 		return fmt.Errorf("failed to list machines: %v", err)
 	}

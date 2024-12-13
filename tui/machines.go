@@ -5,13 +5,19 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/bubbles/list"
-	api "github.com/valyentdev/cli/api"
+	"github.com/valyentdev/cli/http"
 	ravelAPI "github.com/valyentdev/ravel/api"
 )
 
 func ListMachines(fleets []ravelAPI.Fleet, fleetID string) error {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve machines from the API.
-	machines, err := api.GetMachines(fleetID)
+	machines, err := client.GetMachines(fleetID)
 	if err != nil {
 		return err
 	}
@@ -67,8 +73,14 @@ func getStatusString(status string) string {
 }
 
 func SelectMachine(fleetID string) (string, error) {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return "", fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve machines from the API.
-	machines, err := api.GetMachines(fleetID)
+	machines, err := client.GetMachines(fleetID)
 	if err != nil {
 		return "", err
 	}
@@ -87,8 +99,14 @@ func SelectMachine(fleetID string) (string, error) {
 }
 
 func ListMachineEvents(fleetID, machineID string) error {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
 	// Retrieve events from the API.
-	events, err := api.GetMachineEvents(fleetID, machineID)
+	events, err := client.GetMachineEvents(fleetID, machineID)
 	if err != nil {
 		return err
 	}

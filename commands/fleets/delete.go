@@ -5,7 +5,7 @@ import (
 
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
-	"github.com/valyentdev/cli/api"
+	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -46,7 +46,14 @@ func runDeleteFleetCmd(fleetID string) (err error) {
 		return
 	}
 
-	if err = api.DeleteFleet(fleetID); err != nil {
+	// Initialize new Valyent API HTTP client.
+	client, err := http.NewClient()
+	if err != nil {
+		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+	}
+
+	// Call the API asking for fleet deletion.
+	if err = client.DeleteFleet(fleetID); err != nil {
 		return err
 	}
 
