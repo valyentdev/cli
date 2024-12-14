@@ -11,12 +11,13 @@ import (
 	ravelAPI "github.com/valyentdev/ravel/api"
 )
 
-func StoreAPIKey(key string) (err error) {
+func StoreAPIKey(namespace, key string) (err error) {
 	_, err = initConfigDir()
 	if err != nil {
 		return err
 	}
 
+	viper.Set("namespace", namespace)
 	viper.Set("key", key)
 
 	if err := viper.WriteConfig(); err != nil {
@@ -84,6 +85,25 @@ func RetrieveAPIKey() (string, error) {
 	}
 
 	key := viper.GetString("key")
+
+	return key, nil
+}
+
+func RetrieveNamespace() (string, error) {
+	configDir, err := initConfigDir()
+	if err != nil {
+		return "", err
+	}
+
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(configDir)
+
+	if err := viper.ReadInConfig(); err != nil {
+		return "", err
+	}
+
+	key := viper.GetString("namespace")
 
 	return key, nil
 }

@@ -1,5 +1,5 @@
 {
-  "region": "gra",
+  "region": "gra-1",
   "skip_start": false,
   "config": {
     "image": "docker.io/codercom/code-server:latest",

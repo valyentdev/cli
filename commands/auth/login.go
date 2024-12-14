@@ -21,7 +21,8 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
-	"github.com/valyentdev/valyent.go"
+	"github.com/valyentdev/cli/pkg/exit"
+	api "github.com/valyentdev/valyent.go"
 )
 
 func newLoginCmd() *cobra.Command {
@@ -36,7 +37,10 @@ func newLoginCmd() *cobra.Command {
 }
 
 func runLoginCmd() (err error) {
-	var apiKey string
+	var (
+		namespace string
+		apiKey    string
+	)
 
 	var manual bool
 	err = huh.NewConfirm().
@@ -58,14 +62,14 @@ func runLoginCmd() (err error) {
 			return
 		}
 	} else {
-		apiKey, err = retrieveAPIKeyFromTheBrowser()
+		namespace, apiKey, err = retrieveAPIKeyFromTheBrowser()
 		if err != nil {
 			return
 		}
 	}
 
 	// Store the API Key on the user's machine.
-	err = config.StoreAPIKey(apiKey)
+	err = config.StoreAPIKey(namespace, apiKey)
 	if err != nil {
 		return
 	}
@@ -73,7 +77,7 @@ func runLoginCmd() (err error) {
 	// Authenticate Docker (allowing to interact directly with Valyent's registry).
 	err = authenticateDockerRegistry(apiKey)
 	if err != nil {
-		return
+		exit.WithError(err)
 	}
 
 	fmt.Println("🎉 Successfully authenticated.")
@@ -81,7 +85,7 @@ func runLoginCmd() (err error) {
 	return
 }
 
-func retrieveAPIKeyFromTheBrowser() (apiKey string, err error) {
+func retrieveAPIKeyFromTheBrowser() (namespace, apiKey string, err error) {
 	err = spinner.New().
 		Title("Waiting for authentication...").
 		Action(func() {
@@ -113,7 +117,7 @@ func retrieveAPIKeyFromTheBrowser() (apiKey string, err error) {
 			}
 
 			// Wait for the user to authenticate his session.
-			apiKey, err = waitForLogin(res.SessionID)
+			namespace, apiKey, err = waitForLogin(res.SessionID)
 			if err != nil {
 				return
 			}
@@ -123,7 +127,7 @@ func retrieveAPIKeyFromTheBrowser() (apiKey string, err error) {
 	return
 }
 
-func waitForLogin(sessionId string) (apiKey string, err error) {
+func waitForLogin(sessionId string) (namespace, apiKey string, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 
@@ -133,28 +137,29 @@ func waitForLogin(sessionId string) (apiKey string, err error) {
 	for {
 		select {
 		case <-ctx.Done():
-			return "", fmt.Errorf("login timed out after 2 minutes")
+			return "", "", fmt.Errorf("login timed out after 2 minutes")
 		case <-ticker.C:
 			// Initialize new Valyent API HTTP client.
 			client, err := http.NewClient()
 			if err != nil {
-				return "", fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
+				return "", "", fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 			}
 
 			type waitForLoginResponse struct {
-				Status string `json:"status"`
-				APIKey string `json:"apiKey"`
+				Status    string `json:"status"`
+				APIKey    string `json:"apiKey"`
+				Namespace string `json:"namespace"`
 			}
 			res := &waitForLoginResponse{}
 
 			path := "/auth/cli/" + sessionId + "/wait"
 			err = client.PerformRequest(stdHTTP.MethodGet, path, nil, res)
 			if err != nil {
-				return "", fmt.Errorf("authentication check failed: %w", err)
+				return "", "", fmt.Errorf("authentication check failed: %w", err)
 			}
 
 			if res.Status != "pending" {
-				return res.APIKey, nil
+				return res.Namespace, res.APIKey, nil
 			}
 		}
 	}

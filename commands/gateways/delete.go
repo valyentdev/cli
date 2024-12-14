@@ -48,10 +48,11 @@ func runDeleteGatewayCmd(gatewayID string, confirmed bool) (err error) {
 	// If the gateway is not specified by the user as a command flag,
 	// we ask for it with a nice TUI.
 	if gatewayID == "" {
-		gatewayID, err = tui.SelectGateway(fleets)
+		gateway, err := tui.SelectGateway(fleets)
 		if err != nil {
 			return err
 		}
+		gatewayID = gateway.Id
 	}
 
 	// Ask for deletion confirmation,

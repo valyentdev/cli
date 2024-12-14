@@ -74,7 +74,7 @@ func runCreateGatewayCmd() (err error) {
 		return fmt.Errorf("failed to create gateway: %v", err)
 	}
 
-	fmt.Printf("Gateway successfully created with ID \"%s\"!\n", gtw.Id)
+	fmt.Printf("Gateway successfully created with ID \"%s\".\n", gtw.Id)
 
 	return
 }
