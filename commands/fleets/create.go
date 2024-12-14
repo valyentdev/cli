@@ -6,19 +6,24 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/ravel/api"
 )
 
 func newCreateFleetCmd() *cobra.Command {
 	createFleetCmd := &cobra.Command{
 		Use: "create",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			name, err := cmd.Flags().GetString("name")
 			if err != nil {
 				return err
 			}
 
-			return runCreateFleetCmd(name)
+			if err := runCreateFleetCmd(name); err != nil {
+				exit.WithError(err)
+			}
+
+			return
 		},
 	}
 

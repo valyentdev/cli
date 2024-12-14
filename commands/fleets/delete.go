@@ -27,6 +27,7 @@ func newDeleteFleetCmd() *cobra.Command {
 }
 
 func runDeleteFleetCmd(fleetID string) (err error) {
+	// If the fleet if not specified by a flag, we let the user visually select it.
 	if fleetID == "" {
 		fleetID, err = tui.SelectFleet()
 		if err != nil {

@@ -52,7 +52,7 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/valyentdev/valyent.go v0.0.0-00010101000000-000000000000
+	github.com/valyentdev/valyent.go v0.0.0-20241213145357-80ffb27931e9
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect

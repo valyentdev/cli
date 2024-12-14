@@ -6,7 +6,6 @@ import (
 	"os/signal"
 
 	commands "github.com/valyentdev/cli/commands"
-	"github.com/valyentdev/cli/pkg/exit"
 )
 
 func main() {
@@ -14,7 +13,5 @@ func main() {
 	defer cancel()
 
 	rootCmd := commands.NewRootCmd()
-	if err := rootCmd.ExecuteContext(ctx); err != nil {
-		exit.WithError(err)
-	}
+	rootCmd.ExecuteContext(ctx)
 }
