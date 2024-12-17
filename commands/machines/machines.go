@@ -4,7 +4,9 @@ import "github.com/spf13/cobra"
 
 func NewCmd() *cobra.Command {
 	machinesCmd := &cobra.Command{
-		Use: "machines",
+		Use:     "machines",
+		Short:   "m",
+		Aliases: []string{"machine"},
 	}
 	machinesCmd.AddCommand(newListMachinesCmd())
 	machinesCmd.AddCommand(newLogsCmd())

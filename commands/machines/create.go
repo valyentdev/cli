@@ -64,7 +64,7 @@ func runCreateMachineCmd(jsonFilePath string) error {
 		return fmt.Errorf("failed to create machine: %v", err)
 	}
 
-	fmt.Printf("Machine successfully created with id: \"%s\".", machine.Id)
+	fmt.Printf("🚀 Machine successfully created with id: \"%s\".\n", machine.Id)
 
 	return nil
 }
