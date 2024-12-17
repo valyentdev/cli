@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -24,7 +25,18 @@ func SelectFleet() (fleetID string, err error) {
 		return "", err
 	}
 
-	return SelectFleetWithFleets(fleets)
+	fleetID, err = SelectFleetWithFleets(fleets)
+	if err != nil {
+		return "", err
+	}
+
+	// Ensure a fleet ID has been specified.
+	if fleetID == "" {
+		return "", errors.New("no fleet was selected")
+
+	}
+
+	return
 }
 
 // SelectFleetWithFleets prompts the user to select an existing fleet from the list.

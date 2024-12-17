@@ -11,7 +11,8 @@ import (
 
 func newDeleteFleetCmd() *cobra.Command {
 	deleteFleetCmd := &cobra.Command{
-		Use: "delete",
+		Use:     "delete",
+		Aliases: []string{"remove"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fleetID, err := cmd.Flags().GetString("fleet")
 			if err != nil {

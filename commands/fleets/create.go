@@ -60,7 +60,7 @@ func runCreateFleetCmd(name string) error {
 		return fmt.Errorf("failed to create fleet: %v", err)
 	}
 
-	fmt.Printf("Fleet successfully created with id \"%s\"!", fleet.Id)
+	fmt.Printf("Fleet successfully created with id \"%s\"!\n", fleet.Id)
 
 	return nil
 }

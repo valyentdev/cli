@@ -11,7 +11,8 @@ import (
 
 func newDeleteGatewayCmd() *cobra.Command {
 	deleteGatewayCmd := &cobra.Command{
-		Use: "delete",
+		Use:     "delete",
+		Aliases: []string{"remove"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			gatewayID, err := cmd.Flags().GetString("gateway")
 			if err != nil {

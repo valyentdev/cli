@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -82,7 +83,7 @@ func SelectMachine(fleetID string) (string, error) {
 	// Retrieve machines from the API.
 	machines, err := client.GetMachines(fleetID)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to retrieve machines from the API: %v", err)
 	}
 
 	items := []list.Item{}
@@ -95,7 +96,16 @@ func SelectMachine(fleetID string) (string, error) {
 		})
 	}
 
-	return FancySelect("Select a Machine", items)
+	machineID, err := FancySelect("Select a Machine", items)
+	if err != nil {
+		return "", err
+	}
+
+	if machineID == "" {
+		return "", errors.New("no machine has been selected")
+	}
+
+	return machineID, nil
 }
 
 func ListMachineEvents(fleetID, machineID string) error {
