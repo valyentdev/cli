@@ -21,7 +21,6 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
-	"github.com/valyentdev/cli/pkg/exit"
 	api "github.com/valyentdev/valyent.go"
 )
 
@@ -75,10 +74,11 @@ func runLoginCmd() (err error) {
 	}
 
 	// Authenticate Docker (allowing to interact directly with Valyent's registry).
-	err = authenticateDockerRegistry(apiKey)
-	if err != nil {
-		exit.WithError(err)
-	}
+	// TODO: Uncomment this once the registry is up and running!
+	// err = authenticateDockerRegistry(apiKey)
+	// if err != nil {
+	// 	exit.WithError(err)
+	// }
 
 	fmt.Println("🎉 Successfully authenticated.")
 
