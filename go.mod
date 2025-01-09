@@ -13,10 +13,24 @@ require (
 	github.com/charmbracelet/huh v0.6.0
 	github.com/charmbracelet/huh/spinner v0.0.0-20241011224433-983a50776b31
 	github.com/charmbracelet/lipgloss v0.13.0
-	github.com/pelletier/go-toml/v2 v2.2.3
+	github.com/docker/docker v27.4.1+incompatible
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/valyentdev/ravel/api v0.0.0-20241210150259-86f9b87eb44c
+)
+
+require (
+	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
+	github.com/containerd/log v0.1.0 // indirect
+	github.com/klauspost/compress v1.17.2 // indirect
+	github.com/moby/patternmatcher v0.6.0 // indirect
+	github.com/moby/sys/sequential v0.6.0 // indirect
+	github.com/moby/sys/user v0.3.0 // indirect
+	github.com/moby/sys/userns v0.1.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
+	gotest.tools/v3 v3.5.1 // indirect
 )
 
 require (
@@ -52,7 +66,7 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/valyentdev/valyent.go v0.0.0-20241213145357-80ffb27931e9
+	github.com/valyentdev/valyent.go v0.0.0-20241217092744-4be5e31f58f6
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect

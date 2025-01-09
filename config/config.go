@@ -142,7 +142,7 @@ func InitializeConfigFile(fleetID string) error {
 	region := ""
 	err = huh.NewSelect[string]().
 		Title("Primary region:").
-		Options(huh.NewOption("gra (France)", "gra")).
+		Options(huh.NewOption("gra-1 (France)", "gra-1")).
 		Value(&region).
 		Run()
 	if err != nil {
@@ -158,7 +158,7 @@ func InitializeConfigFile(fleetID string) error {
 
 	vi.Set("config.image", "<replace-with-actual-image>")
 	vi.Set("config.workload", []string{})
-	vi.Set("config.workload.policy", "always")
+	vi.Set("config.workload.restart.policy", "always")
 	vi.Set("config.workload.init.user", "root")
 
 	vi.Set("region", region)

@@ -57,7 +57,7 @@ init:
 		return
 	}
 
-	fmt.Println("Valyent configuration file created.")
+	fmt.Println("🎉 Valyent configuration file created.")
 
 	return
 }
