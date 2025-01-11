@@ -33,7 +33,6 @@ func SelectFleet() (fleetID string, err error) {
 	// Ensure a fleet ID has been specified.
 	if fleetID == "" {
 		return "", errors.New("no fleet was selected")
-
 	}
 
 	return

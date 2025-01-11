@@ -3,6 +3,7 @@ package commands
 import (
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/commands/auth"
+	"github.com/valyentdev/cli/commands/env"
 	"github.com/valyentdev/cli/commands/fleets"
 	"github.com/valyentdev/cli/commands/gateways"
 	"github.com/valyentdev/cli/commands/machines"
@@ -17,6 +18,7 @@ func NewRootCmd() *cobra.Command {
 	rootCmd.AddCommand(fleets.NewCmd())
 	rootCmd.AddCommand(gateways.NewCmd())
 	rootCmd.AddCommand(machines.NewCmd())
+	rootCmd.AddCommand(env.NewCmd())
 	rootCmd.AddCommand(newInitCmd())
 	rootCmd.AddCommand(newDeployCmd())
 	rootCmd.AddCommand(newOpenCmd())
