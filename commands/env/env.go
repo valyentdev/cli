@@ -8,6 +8,7 @@ func NewCmd() *cobra.Command {
 	}
 	fleetsCmd.AddCommand(newListEnvCmd())
 	fleetsCmd.AddCommand(newSetEnvCmd())
+	fleetsCmd.AddCommand(newLoadEnvCmd())
 
 	return fleetsCmd
 }
