@@ -21,6 +21,7 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
+	"github.com/valyentdev/valyent.go"
 	api "github.com/valyentdev/valyent.go"
 )
 
@@ -109,7 +110,7 @@ func retrieveAPIKeyFromTheBrowser() (namespace, apiKey string, err error) {
 			}
 
 			// Open the authentication page in the browser.
-			baseURL := env.GetVar("VALYENT_API_URL", "https://console.valyent.cloud")
+			baseURL := env.GetVar("VALYENT_API_URL", valyent.DEFAULT_BASE_URL)
 			url := baseURL + "/auth/cli/" + res.SessionID
 			err = openInBrowser(url)
 			if err != nil {

@@ -2,6 +2,7 @@ package commands
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -10,7 +11,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
-	api "github.com/valyentdev/valyent.go"
+	"github.com/valyentdev/cli/pkg/env"
+	"github.com/valyentdev/cli/tui"
+	"github.com/valyentdev/valyent.go"
 )
 
 func newDeployCmd() *cobra.Command {
@@ -50,7 +53,7 @@ func runDeployCmd() error {
 	}
 
 	// Create a new deployment by uploading the tarball, ...
-	_, err = client.CreateDeployment(namespace, cfg.FleetID, api.CreateDeploymentPayload{
+	depl, err := client.CreateDeployment(namespace, cfg.FleetID, valyent.CreateDeploymentPayload{
 		Machine: cfg.CreateMachinePayload,
 	}, tarball)
 	if err != nil {
@@ -59,10 +62,17 @@ func runDeployCmd() error {
 
 	fmt.Println("🎉 Deployment successfully created!")
 
-	deploymentURL := "https://console.valyent.cloud/organizations/" +
-		namespace + "/applications/+" + cfg.FleetID + "/deployments"
-	fmt.Printf("You can monitor it at this address: %s\n", deploymentURL)
+	baseURL := env.GetVar("VALYENT_API_URL", valyent.DEFAULT_BASE_URL)
+	deploymentsPath := fmt.Sprintf(
+		"/organizations/%s/applications/%s/deployments",
+		namespace, cfg.FleetID,
+	)
+	deploymentsURL := baseURL + deploymentsPath
+	fmt.Printf("You can monitor it at this address: %s\n", deploymentsURL)
 
+	tui.StreamMachineLogs(context.Background(), client, valyent.LogStreamOptions{
+		CustomPath: deploymentsPath + "/" + depl.ID + "/builder/logs",
+	})
 	return nil
 }
 

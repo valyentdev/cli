@@ -12,6 +12,7 @@
         "user": "root"
       }
     },
+    "gateway_enabled": true,
     "guest": {
       "cpu_kind": "eco",
       "cpus": 1,
