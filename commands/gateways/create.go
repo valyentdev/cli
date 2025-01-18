@@ -66,10 +66,8 @@ func runCreateGatewayCmd() (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 	}
-
 	// Call the API asking for gateway creation.
-	gtw, err := client.CreateGateway(api.CreateGatewayPayload{
-		Fleet:      fleetID,
+	gtw, err := client.CreateGateway(fleetID, api.CreateGatewayPayload{
 		Name:       name,
 		TargetPort: targetPort,
 	})

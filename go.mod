@@ -2,11 +2,6 @@ module github.com/valyentdev/cli
 
 go 1.23.2
 
-replace (
-	github.com/valyentdev/ravel/api => ../ravel/api
-	github.com/valyentdev/valyent.go => ../valyent.go
-)
-
 require (
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.1.1
@@ -16,7 +11,7 @@ require (
 	github.com/docker/docker v27.4.1+incompatible
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
-	github.com/valyentdev/ravel/api v0.0.0-20241210150259-86f9b87eb44c
+	github.com/valyentdev/ravel/api v0.0.0-20250117144030-2f8a24349958
 )
 
 require (
@@ -66,7 +61,7 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/valyentdev/valyent.go v0.0.0-20241217092744-4be5e31f58f6
+	github.com/valyentdev/valyent.go v0.0.0-20250118151237-9842c64a32d1
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
