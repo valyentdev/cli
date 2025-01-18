@@ -2,14 +2,17 @@ package machines
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 )
 
 func newListMachineEventsCmd() *cobra.Command {
 	listGatewaysCmd := &cobra.Command{
 		Use: "events",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runListMachineEventsCmd()
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runListMachineEventsCmd(); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 

@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -22,7 +23,10 @@ func newDeleteGatewayCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return runDeleteGatewayCmd(gatewayID, confirmed)
+			if err := runDeleteGatewayCmd(gatewayID, confirmed); err != nil {
+				exit.WithError(err)
+			}
+			return nil
 		},
 	}
 

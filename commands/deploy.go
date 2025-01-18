@@ -12,6 +12,7 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 	"github.com/valyentdev/valyent.go"
 )
@@ -20,8 +21,10 @@ func newDeployCmd() *cobra.Command {
 	deployCmd := &cobra.Command{
 		Use:   "deploy",
 		Short: "Deploy your project to Valyent",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDeployCmd()
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runDeployCmd(); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 

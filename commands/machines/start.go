@@ -6,14 +6,17 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 )
 
 func newStartMachineCmd() *cobra.Command {
 	logsCmd := &cobra.Command{
 		Use: "start",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runStartMachineCmd()
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runStartMachineCmd(); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 

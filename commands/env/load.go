@@ -24,7 +24,11 @@ func newLoadEnvCmd() *cobra.Command {
 				return err
 			}
 
-			return runLoadEnvCmd(fleetID, args)
+			if err := runLoadEnvCmd(fleetID, args); err != nil {
+				exit.WithError(err)
+			}
+
+			return nil
 		},
 	}
 	envLoadCmd.Flags().StringP("fleet", "f", "", "Fleet's identifier (optional)")
@@ -35,13 +39,13 @@ func newLoadEnvCmd() *cobra.Command {
 func runLoadEnvCmd(fleetID string, args []string) (err error) {
 	namespace, err := config.RetrieveNamespace()
 	if err != nil {
-		exit.WithError(err)
+		return err
 	}
 
 	if fleetID == "" {
 		fleetID, err = tui.SelectFleet()
 		if err != nil {
-			exit.WithError(err)
+			return err
 		}
 	}
 

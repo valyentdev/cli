@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/auth"
 	"github.com/valyentdev/cli/config"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -19,7 +20,11 @@ func newInitCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return runInitCmd(fleetID)
+			if err := runInitCmd(fleetID); err != nil {
+				exit.WithError(err)
+			}
+
+			return nil
 		},
 	}
 

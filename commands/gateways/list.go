@@ -6,14 +6,17 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	tui "github.com/valyentdev/cli/tui"
 )
 
 func newListGatewaysCmd() *cobra.Command {
 	listGatewaysCmd := &cobra.Command{
 		Use: "list",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runListGatewaysCmd()
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runListGatewaysCmd(); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 

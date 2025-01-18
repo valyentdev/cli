@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 	"github.com/valyentdev/ravel/api"
 )
@@ -20,7 +21,12 @@ func newCreateMachineCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return runCreateMachineCmd(jsonFilePath)
+
+			if err := runCreateMachineCmd(jsonFilePath); err != nil {
+				exit.WithError(err)
+			}
+
+			return nil
 		},
 	}
 

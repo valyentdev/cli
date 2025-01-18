@@ -19,7 +19,11 @@ func newListEnvCmd() *cobra.Command {
 				return err
 			}
 
-			return runListEnvCmd(fleetID)
+			if err := runListEnvCmd(fleetID); err != nil {
+				exit.WithError(err)
+			}
+
+			return nil
 		},
 	}
 	listEnvCmd.Flags().StringP("fleet", "f", "", "Fleet's identifier (optional)")
@@ -27,27 +31,27 @@ func newListEnvCmd() *cobra.Command {
 	return listEnvCmd
 }
 
-func runListEnvCmd(fleetID string) (err error) {
+func runListEnvCmd(fleetID string) error {
 	namespace, err := config.RetrieveNamespace()
 	if err != nil {
-		exit.WithError(err)
+		return err
 	}
 
 	if fleetID == "" {
 		fleetID, err = tui.SelectFleet()
 		if err != nil {
-			exit.WithError(err)
+			return err
 		}
 	}
 
 	client, err := http.NewClient()
 	if err != nil {
-		exit.WithError(err)
+		return err
 	}
 
 	envs, err := client.GetEnvironmentVariables(namespace, fleetID)
 	if err != nil {
-		exit.WithError(err)
+		return err
 	}
 
 	tui.ShowTable(

@@ -11,6 +11,7 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/tui"
 )
 
@@ -18,8 +19,10 @@ func newOpenCmd() *cobra.Command {
 	openCmd := &cobra.Command{
 		Use:   "open",
 		Short: "Open application in the browser",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runOpenCmd()
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runOpenCmd(); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 

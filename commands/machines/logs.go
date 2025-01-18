@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/cli/pkg/logs"
 	"github.com/valyentdev/cli/tui"
 	"github.com/valyentdev/valyent.go"
@@ -16,8 +17,10 @@ func newLogsCmd() *cobra.Command {
 	logsCmd := &cobra.Command{
 		Use:   "logs",
 		Short: "Display logs from a machine",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runLogsCmd(follow)
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runLogsCmd(follow); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 
