@@ -123,10 +123,6 @@ func InitializeConfigFile(fleetID string) error {
 	if _, err := os.Create("valyent.json"); err != nil {
 		return err
 	}
-	machineGuestCfg, err := askForMachineSpecs()
-	if err != nil {
-		return err
-	}
 
 	vi := viper.New()
 	vi.SetConfigName("valyent")
@@ -135,36 +131,7 @@ func InitializeConfigFile(fleetID string) error {
 
 	vi.Set("fleet_id", fleetID)
 
-	vi.Set("config.guest.cpu_kind", machineGuestCfg.CpuKind)
-	vi.Set("config.guest.cpus", machineGuestCfg.Cpus)
-	vi.Set("config.guest.memory_mb", machineGuestCfg.MemoryMB)
-
-	region := ""
-	err = huh.NewSelect[string]().
-		Title("Primary region:").
-		Options(huh.NewOption("gra-1 (France)", "gra-1")).
-		Value(&region).
-		Run()
-	if err != nil {
-		return err
-	}
-
-	// Prompt for whether machines should be created with skip start option by default.
-	skipStart := false
-	err = huh.NewConfirm().Title("Skip machine start on creation").Value(&skipStart).Run()
-	if err != nil {
-		return err
-	}
-
-	vi.Set("config.image", "<replace-with-actual-image>")
-	vi.Set("config.workload", []string{})
-	vi.Set("config.workload.restart.policy", "always")
-	vi.Set("config.workload.init.user", "root")
-
-	vi.Set("region", region)
-	vi.Set("skip_start", skipStart)
-
-	if err = vi.WriteConfig(); err != nil {
+	if err := vi.WriteConfig(); err != nil {
 		return err
 	}
 
@@ -181,7 +148,7 @@ type VCPUConfig struct {
 	MemoryConfigs []int
 }
 
-func askForMachineSpecs() (*ravelAPI.GuestConfig, error) {
+func AskForMachineSpecs() (*ravelAPI.GuestConfig, error) {
 	templates := map[string][]VCPUConfig{
 		"eco": {
 			{VCPUs: 1, MemoryConfigs: []int{256, 512, 1024, 2048}},
