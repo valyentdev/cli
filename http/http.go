@@ -5,14 +5,14 @@ import (
 	"os"
 
 	"github.com/valyentdev/cli/config"
-	api "github.com/valyentdev/valyent.go"
+	"github.com/valyentdev/valyent.go"
 )
 
 // NewClient initializes a new Valyent HTTP API client instance,
 // providing the API key and allowing to specify the API base url from an environment variable.
-func NewClient() (*api.Client, error) {
+func NewClient() (*valyent.Client, error) {
 	// Initialize a new Valyent HTTP API client instance.
-	client := api.NewClient()
+	client := valyent.NewClient()
 
 	// Customize the client's base URL field, if specified as an environment variable.
 	if baseURL := os.Getenv("VALYENT_API_URL"); baseURL != "" {
