@@ -38,14 +38,17 @@ func runOpenCmd() (err error) {
 		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 	}
 
-	// We retrieve fleets from the API,
-	// from the currently authenticated namespace.
-	fleets, err := client.GetFleets()
+	fleetID, err := tui.SelectFleet()
 	if err != nil {
 		return err
 	}
 
-	gtw, err := tui.SelectGateway(fleets)
+	fleet, err := client.GetFleet(fleetID)
+	if err != nil {
+		return err
+	}
+
+	gtw, err := tui.SelectGateway(fleet)
 	if err != nil {
 		return fmt.Errorf("failed to select gateway: %v", err)
 	}

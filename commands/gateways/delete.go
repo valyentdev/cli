@@ -39,9 +39,12 @@ func runDeleteGatewayCmd(gatewayID string, confirmed bool) (err error) {
 		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 	}
 
-	// We retrieve fleets from the API,
-	// from the currently authenticated namespace.
-	fleets, err := client.GetFleets()
+	fleetID, err := tui.SelectFleet()
+	if err != nil {
+		return err
+	}
+
+	fleet, err := client.GetFleet(fleetID)
 	if err != nil {
 		return err
 	}
@@ -49,11 +52,11 @@ func runDeleteGatewayCmd(gatewayID string, confirmed bool) (err error) {
 	// If the gateway is not specified by the user as a command flag,
 	// we ask for it with a nice TUI.
 	if gatewayID == "" {
-		gateway, err := tui.SelectGateway(fleets)
+		gtw, err := tui.SelectGateway(fleet)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to select gateway: %v", err)
 		}
-		gatewayID = gateway.Id
+		gatewayID = gtw.Id
 	}
 
 	// Ask for deletion confirmation,
@@ -77,7 +80,7 @@ func runDeleteGatewayCmd(gatewayID string, confirmed bool) (err error) {
 	}
 
 	// Now, we can safely try to delete the gateway.
-	if err := client.DeleteGateway(gatewayID); err != nil {
+	if err := client.DeleteGateway(fleetID, gatewayID); err != nil {
 		return err
 	}
 

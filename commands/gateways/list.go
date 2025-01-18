@@ -27,14 +27,18 @@ func runListGatewaysCmd() error {
 		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 	}
 
-	// Retrieve fleets from the API.
-	fleets, err := client.GetFleets()
+	fleetID, err := tui.SelectFleet()
+	if err != nil {
+		return err
+	}
+
+	fleet, err := client.GetFleet(fleetID)
 	if err != nil {
 		return err
 	}
 
 	// List gateways.
-	if err := tui.ListGateways(fleets); err != nil {
+	if err := tui.ListGateways(fleet); err != nil {
 		return err
 	}
 

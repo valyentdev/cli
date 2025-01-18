@@ -8,7 +8,7 @@ import (
 	"github.com/valyentdev/ravel/api"
 )
 
-func ListGateways(fleets []api.Fleet) error {
+func ListGateways(fleet api.Fleet) error {
 	// Initialize new Valyent API HTTP client.
 	client, err := http.NewClient()
 	if err != nil {
@@ -16,7 +16,7 @@ func ListGateways(fleets []api.Fleet) error {
 	}
 
 	// Retrieve gateways from the API.
-	gateways, err := client.GetGateways()
+	gateways, err := client.GetGateways(fleet.Id)
 	if err != nil {
 		return err
 	}
@@ -25,23 +25,16 @@ func ListGateways(fleets []api.Fleet) error {
 	items := make([]list.Item, len(gateways))
 	for idx, gateway := range gateways {
 		// Retrieve fleet name
-		fleetName := gateway.FleetId
-		for _, fleet := range fleets {
-			if fleet.Id == gateway.FleetId {
-				fleetName = fleet.Name
-			}
-		}
-
 		items[idx] = ListItem{
 			title:       gateway.Name,
-			description: fmt.Sprintf("Fleet: %s | Target port: %d", fleetName, gateway.TargetPort),
+			description: fmt.Sprintf("Fleet: %s | Target port: %d", fleet.Name, gateway.TargetPort),
 		}
 	}
 
 	return List("List of Gateways", items)
 }
 
-func SelectGateway(fleets []api.Fleet) (gateway *api.Gateway, err error) {
+func SelectGateway(fleet api.Fleet) (gateway *api.Gateway, err error) {
 	// Initialize new Valyent API HTTP client.
 	client, err := http.NewClient()
 	if err != nil {
@@ -49,7 +42,7 @@ func SelectGateway(fleets []api.Fleet) (gateway *api.Gateway, err error) {
 	}
 
 	// Retrieve gateways from the API.
-	gateways, err := client.GetGateways()
+	gateways, err := client.GetGateways(fleet.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -58,16 +51,10 @@ func SelectGateway(fleets []api.Fleet) (gateway *api.Gateway, err error) {
 	items := make([]list.Item, len(gateways))
 	for idx, gateway := range gateways {
 		// Retrieve fleet name
-		fleetName := gateway.FleetId
-		for _, fleet := range fleets {
-			if fleet.Id == gateway.FleetId {
-				fleetName = fleet.Name
-			}
-		}
 
 		items[idx] = FancySelectItem{
 			title:       gateway.Name,
-			description: fmt.Sprintf("Fleet: %s | Target port: %d", fleetName, gateway.TargetPort),
+			description: fmt.Sprintf("Fleet: %s | Target port: %d", fleet.Name, gateway.TargetPort),
 			value:       gateway.Id,
 		}
 	}

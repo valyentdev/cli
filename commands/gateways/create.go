@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 	"github.com/valyentdev/cli/http"
+	"github.com/valyentdev/cli/pkg/exit"
 	tui "github.com/valyentdev/cli/tui"
 	"github.com/valyentdev/ravel/api"
 )
@@ -14,8 +15,10 @@ import (
 func newCreateGatewayCmd() *cobra.Command {
 	createGatewayCmd := &cobra.Command{
 		Use: "create",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCreateGatewayCmd()
+		Run: func(cmd *cobra.Command, args []string) {
+			if err := runCreateGatewayCmd(); err != nil {
+				exit.WithError(err)
+			}
 		},
 	}
 
