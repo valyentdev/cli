@@ -11,8 +11,7 @@ import (
 
 func newListEnvCmd() *cobra.Command {
 	listEnvCmd := &cobra.Command{
-		Use:   "list",
-		Short: "ls",
+		Use: "list",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fleetID, err := cmd.Flags().GetString("fleet")
 			if err != nil {
