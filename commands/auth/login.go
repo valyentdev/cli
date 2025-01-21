@@ -21,65 +21,82 @@ import (
 	"github.com/valyentdev/cli/config"
 	"github.com/valyentdev/cli/http"
 	"github.com/valyentdev/cli/pkg/env"
+	"github.com/valyentdev/cli/pkg/exit"
 	"github.com/valyentdev/valyent.go"
-	api "github.com/valyentdev/valyent.go"
 )
 
 func newLoginCmd() *cobra.Command {
 	loginCmd := &cobra.Command{
 		Use: "login",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runLoginCmd()
+			apiKey, err := cmd.Flags().GetString("api-key")
+			if err != nil {
+				return err
+			}
+			organization, err := cmd.Flags().GetString("organization")
+			if err != nil {
+				return err
+			}
+
+			if err := runLoginCmd(apiKey, organization); err != nil {
+				exit.WithError(err)
+			}
+
+			return nil
 		},
 	}
+	loginCmd.Flags().String("api-key", "", "API key (optional)")
+	loginCmd.Flags().String("organization", "", "Organization (optional)")
 
 	return loginCmd
 }
 
-func runLoginCmd() (err error) {
-	var (
-		namespace string
-		apiKey    string
-	)
-
-	var manual bool
-	err = huh.NewConfirm().
-		Title("Do you want to manually copy/paste an API Key created from Valyent's dashboard?").
-		Negative("No.").
-		Affirmative("Yes!").
-		Value(&manual).
-		Run()
-	if err != nil {
-		return
+func runLoginCmd(apiKey, organization string) (err error) {
+	if apiKey != "" {
+		goto authenticate
 	}
 
-	if manual {
-		err = huh.NewInput().
-			Title("Copy/paste your API key below").
-			Value(&apiKey).
+	{
+		manual := false
+
+		err = huh.NewConfirm().
+			Title("Do you want to manually copy/paste an API Key created from Valyent's dashboard?").
+			Negative("No.").
+			Affirmative("Yes!").
+			Value(&manual).
 			Run()
 		if err != nil {
 			return
 		}
-	} else {
-		namespace, apiKey, err = retrieveAPIKeyFromTheBrowser()
-		if err != nil {
-			return
+
+		if manual {
+			err = huh.NewInput().
+				Title("Copy/paste your API key below").
+				Value(&apiKey).
+				Run()
+			if err != nil {
+				return
+			}
+		} else {
+			organization, apiKey, err = retrieveAPIKeyFromTheBrowser()
+			if err != nil {
+				return
+			}
 		}
 	}
 
+authenticate:
 	// Store the API Key on the user's machine.
-	err = config.StoreAPIKey(namespace, apiKey)
+	err = config.StoreAPIKey(organization, apiKey)
 	if err != nil {
 		return
 	}
 
 	// Authenticate Docker (allowing to interact directly with Valyent's registry).
-	// TODO: Uncomment this once the registry is up and running!
-	// err = authenticateDockerRegistry(apiKey)
-	// if err != nil {
-	// 	exit.WithError(err)
-	// }
+	err = authenticateDockerRegistry(apiKey)
+	if err != nil {
+		exit.WithError(err)
+	}
 
 	fmt.Println("🎉 Successfully authenticated.")
 
@@ -91,7 +108,7 @@ func retrieveAPIKeyFromTheBrowser() (namespace, apiKey string, err error) {
 		Title("Waiting for authentication...").
 		Action(func() {
 			// Initialize new Valyent API HTTP client.
-			var client *api.Client
+			var client *valyent.Client
 			client, err = http.NewClient()
 			if err != nil {
 				err = fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
