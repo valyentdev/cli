@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	stdHTTP "net/http"
 	"os"
 	"os/exec"
@@ -215,32 +214,13 @@ func authenticateDockerRegistry(apiKey string) (err error) {
 	defer cancel()
 
 	var out bytes.Buffer
-	cmd := exec.CommandContext(ctx, binary, "login", "--username=x", "--password-stdin", registryHost)
+	cmd := exec.CommandContext(ctx, binary, "login", "--username=x", "--password", apiKey, registryHost)
 	cmd.Stdout = &out
 	cmd.Stderr = &out
-
-	// Set up standard input for the `docker login` command.
-	var in io.WriteCloser
-	if in, err = cmd.StdinPipe(); err != nil {
-		return err
-	}
-
-	// This defer is for early-returns before successfully writing to the stream, hence safe.
-	defer func() {
-		if in != nil {
-			in.Close()
-		}
-	}()
 
 	// Start the command (without stopping it, yet).
 	if err = cmd.Start(); err != nil {
 		return
-	}
-
-	// Pass the API Key to the stdin.
-	_, err = fmt.Fprint(in, apiKey)
-	if err != nil {
-		return err
 	}
 
 	// Wait for the `docker login` command to be completed
