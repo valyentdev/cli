@@ -21,21 +21,37 @@ func newDeployCmd() *cobra.Command {
 	deployCmd := &cobra.Command{
 		Use:   "deploy",
 		Short: "Deploy your project to Valyent",
-		Run: func(cmd *cobra.Command, args []string) {
-			if err := runDeployCmd(); err != nil {
+		RunE: func(cmd *cobra.Command, args []string) error {
+			organization, err := cmd.Flags().GetString("organization")
+			if err != nil {
+				return err
+			}
+			fleet, err := cmd.Flags().GetString("fleet")
+			if err != nil {
+				return err
+			}
+			noBuild, err := cmd.Flags().GetBool("no-build")
+			if err != nil {
+				return err
+			}
+			if err := runDeployCmd(organization, fleet, noBuild); err != nil {
 				exit.WithError(err)
 			}
+			return nil
 		},
 	}
+	deployCmd.Flags().String("organization", "", "Organization identifier to use (optional)")
+	deployCmd.Flags().String("fleet", "", "Fleet's identifier to use (optional)")
+	deployCmd.Flags().Bool("no-build", false, "Do not build the project before deploying (optional)")
 
 	return deployCmd
 }
 
-func runDeployCmd() error {
+func runDeployCmd(organization, fleet string, noBuild bool) error {
 	// Retrieve the project configuration from the `valyent.json`.
-	cfg, err := config.RetrieveProjectConfiguration()
-	if err != nil {
-		return err
+	cfg, _ := config.RetrieveProjectConfiguration()
+	if fleet == "" {
+		fleet = cfg.FleetID
 	}
 
 	// Initialize new Valyent API HTTP client.
@@ -44,19 +60,25 @@ func runDeployCmd() error {
 		return fmt.Errorf("failed to initialize Valyent API HTTP client: %v", err)
 	}
 
-	// Turn current work dir into tarball to upload
-	tarball, err := makeTarball()
-	if err != nil {
-		return fmt.Errorf("failed to prepare tarball of codebase: %v", err)
+	var tarball io.ReadCloser
+	if !noBuild {
+		// Turn current work dir into tarball to upload
+		tarball, err = makeTarball()
+		if err != nil {
+			return fmt.Errorf("failed to prepare tarball of codebase: %v", err)
+		}
 	}
 
-	namespace, err := config.RetrieveNamespace()
-	if err != nil {
-		return fmt.Errorf("failed to retrieve namespace: %v", err)
+	if organization == "" {
+		namespace, err := config.RetrieveNamespace()
+		if err != nil {
+			return fmt.Errorf("failed to retrieve namespace: %v", err)
+		}
+		organization = namespace
 	}
 
 	// Create a new deployment by uploading the tarball, ...
-	depl, err := client.CreateDeployment(namespace, cfg.FleetID, valyent.CreateDeploymentPayload{
+	depl, err := client.CreateDeployment(organization, fleet, valyent.CreateDeploymentPayload{
 		Machine: cfg.CreateMachinePayload,
 	}, tarball)
 	if err != nil {
@@ -68,14 +90,17 @@ func runDeployCmd() error {
 	baseURL := env.GetVar("VALYENT_API_URL", valyent.DEFAULT_BASE_URL)
 	deploymentsPath := fmt.Sprintf(
 		"/organizations/%s/applications/%s/deployments",
-		namespace, cfg.FleetID,
+		organization, fleet,
 	)
 	deploymentsURL := baseURL + deploymentsPath
 	fmt.Printf("You can monitor it at this address: %s\n", deploymentsURL)
 
-	tui.StreamMachineLogs(context.Background(), client, valyent.LogStreamOptions{
-		CustomPath: deploymentsPath + "/" + depl.ID + "/builder/logs",
-	})
+	if !noBuild {
+		tui.StreamMachineLogs(context.Background(), client, valyent.LogStreamOptions{
+			CustomPath: deploymentsPath + "/" + depl.ID + "/builder/logs",
+		})
+	}
+
 	return nil
 }
 

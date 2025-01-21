@@ -12,6 +12,7 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/viper v1.19.0
 	github.com/valyentdev/ravel/api v0.0.0-20250117144030-2f8a24349958
+	github.com/valyentdev/valyent.go v0.1.2
 )
 
 require (
@@ -61,7 +62,6 @@ require (
 	github.com/spf13/cast v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/valyentdev/valyent.go v0.0.0-20250118151237-9842c64a32d1
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d // indirect
