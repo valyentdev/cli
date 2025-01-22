@@ -13,5 +13,7 @@ func main() {
 	defer cancel()
 
 	rootCmd := commands.NewRootCmd()
-	rootCmd.ExecuteContext(ctx)
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
+		os.Exit(1)
+	}
 }

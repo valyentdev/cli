@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -213,10 +212,7 @@ func authenticateDockerRegistry(apiKey string) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var out bytes.Buffer
 	cmd := exec.CommandContext(ctx, binary, "login", "--username=x", "--password", apiKey, registryHost)
-	cmd.Stdout = &out
-	cmd.Stderr = &out
 
 	// Start the command (without stopping it, yet).
 	if err = cmd.Start(); err != nil {
@@ -225,7 +221,7 @@ func authenticateDockerRegistry(apiKey string) (err error) {
 
 	// Wait for the `docker login` command to be completed
 	if err = cmd.Wait(); err != nil {
-		return fmt.Errorf("failed authenticating with %s: %v", registryHost, out.String())
+		return fmt.Errorf("failed authenticating with %s", registryHost)
 	}
 
 	return
