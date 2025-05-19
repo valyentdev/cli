@@ -1,3 +1,5 @@
+_This repo is now archived._
+
 <h1 align="center">
   Valyent CLI
 </h1>
